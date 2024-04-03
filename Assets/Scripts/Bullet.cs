@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -7,6 +9,8 @@ public class Bullet : MonoBehaviour
     private Transform target;
 
     public float speed = 70f;
+    public int damage = 50;
+    public float blastZone = 0f;
     public GameObject impactEffect;
 
     public void Seek(Transform _target)
@@ -33,13 +37,53 @@ public class Bullet : MonoBehaviour
         }
         
         transform.Translate(direction.normalized * distThisFrame, Space.World);
+        transform.LookAt(target);
     }
 
     void HitTarget()
     {
         GameObject effectInst = (GameObject)Instantiate(impactEffect, transform.position, transform.rotation);
-        Destroy(effectInst, 2f);
-        Destroy(target.gameObject);
+        Destroy(effectInst, 5f);
+
+        if (blastZone > 0)
+        {
+            Explode();
+        }
+        else
+        {
+            Damage(target);
+        }
+        
+        
         Destroy(gameObject);
+    }
+
+    // check for blast damage from missiles
+    void Explode()
+    {
+        Collider[] collisions = Physics.OverlapSphere(transform.position, blastZone);
+        foreach (var collider in collisions)
+        {
+            if (collider.tag == "enemy")
+            {
+                Damage(collider.transform);
+            }
+        }
+    }
+
+    void Damage(Transform enemy)
+    {
+        Enemy e = enemy.GetComponent<Enemy>();
+        if (e != null)
+        {
+            e.TakeDamage(damage);
+        }
+    }
+
+    // draw missile explosion area
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, blastZone);
     }
 }
