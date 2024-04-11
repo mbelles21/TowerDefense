@@ -1,7 +1,8 @@
-using System;
+ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
@@ -9,21 +10,33 @@ public class Enemy : MonoBehaviour
     
     [HideInInspector]
     public float speed;
+    private float health;
     
-    public float health = 100;
+    public float startHealth = 100;
+    
+    
     public int value = 50; // how much money it gives you
     public GameObject deathEffect;
 
+    [Header("Unity Stuff")] 
+    public Image healthBar;
+
+
+    private bool isDead = false;
+    
     private void Start()
     {
         speed = baseSpeed;
+        health = startHealth;
     }
 
     public void TakeDamage(float amount)
     {
         health -= amount;
 
-        if (health <= 0)
+        healthBar.fillAmount = health / startHealth;
+
+        if (health <= 0 && !isDead)
         {
             Die();
         }
@@ -36,10 +49,15 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
+        isDead = true;
+        
         PlayerStats.Money += value;
         
         GameObject effect = (GameObject)Instantiate(deathEffect, transform.position, Quaternion.identity);
         Destroy(effect, 5f);
+
+        WaveSpawner.EnemiesAlive--;
+        
         Destroy(gameObject);
     }
 

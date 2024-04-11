@@ -11,25 +11,12 @@ public class CameraController : MonoBehaviour
     public float minY = 10f;
     public float maxY = 80f;
 
-    private bool doMovement = true;
-
     // Update is called once per frame
     void Update()
     {
         if (GameManager.gameEnded)
         {
             this.enabled = false;
-            return;
-        }
-        
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            doMovement = !doMovement;
-        }
-        
-        // disable camera pan if mouse is not in game window
-        if (!doMovement)
-        {
             return;
         }
         

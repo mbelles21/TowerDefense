@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Cinemachine;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -12,6 +13,9 @@ public class Bullet : MonoBehaviour
     public int damage = 50;
     public float blastZone = 0f;
     public GameObject impactEffect;
+    
+    // for cinemachine
+    // public CameraShake cameraShake;
 
     public void Seek(Transform _target)
     {
@@ -42,6 +46,8 @@ public class Bullet : MonoBehaviour
 
     void HitTarget()
     {
+        // cameraShake.ScreenShake();
+        
         GameObject effectInst = (GameObject)Instantiate(impactEffect, transform.position, transform.rotation);
         Destroy(effectInst, 5f);
 

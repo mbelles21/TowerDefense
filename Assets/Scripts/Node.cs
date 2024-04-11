@@ -38,13 +38,13 @@ public class Node : MonoBehaviour
         {
             return;
         }
-        
+
         if (turret != null)
         {
             buildManager.SelectNode(this);
             return;
         }
-        
+
         if (!buildManager.CanBuild)
         {
             return;
@@ -54,6 +54,28 @@ public class Node : MonoBehaviour
 
     }
 
+    void BuildTurret(TurretBlueprint blueprint)
+    {
+        if (PlayerStats.Money < blueprint.cost)
+        {
+            Debug.Log("not enough money");
+            return;
+        }
+
+        PlayerStats.Money -= blueprint.cost;
+        
+        // build turret
+        GameObject _turret = (GameObject)Instantiate(blueprint.prefab, GetBuildPos(), Quaternion.identity);
+        turret = _turret;
+
+        turretBlueprint = blueprint;
+
+        GameObject effect = (GameObject)Instantiate(buildManager.buildEffect, GetBuildPos(), Quaternion.identity);
+        Destroy(effect, 5f);
+        
+        Debug.Log("turret built.");
+    }
+    
     public void UpgradeTurret()
     {
         if (PlayerStats.Money < turretBlueprint.upgradeCost)
@@ -78,26 +100,15 @@ public class Node : MonoBehaviour
         Debug.Log("turret upgraded!");
     }
 
-    void BuildTurret(TurretBlueprint blueprint)
+    public void SellTurret()
     {
-        if (PlayerStats.Money < blueprint.cost)
-        {
-            Debug.Log("not enough money");
-            return;
-        }
-
-        PlayerStats.Money -= blueprint.cost;
+        PlayerStats.Money += turretBlueprint.GetSellAmount();
         
-        // build turret
-        GameObject _turret = (GameObject)Instantiate(blueprint.prefab, GetBuildPos(), Quaternion.identity);
-        turret = _turret;
-
-        turretBlueprint = blueprint;
-
-        GameObject effect = (GameObject)Instantiate(buildManager.buildEffect, GetBuildPos(), Quaternion.identity);
+        GameObject effect = (GameObject)Instantiate(buildManager.sellEffect, GetBuildPos(), Quaternion.identity);
         Destroy(effect, 5f);
         
-        Debug.Log("turret built.");
+        Destroy(turret);
+        turretBlueprint = null;
     }
 
     private void OnMouseEnter()
